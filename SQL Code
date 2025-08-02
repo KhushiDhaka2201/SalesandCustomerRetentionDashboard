@@ -1,0 +1,17 @@
+-- Monthly Sales and Customer Retention Analysis
+SELECT 
+    o.CustomerID,
+    o.OrderID,
+    s.SellerID,
+    s.SellerName,
+    p.Category,
+    o.OrderDate,
+    EXTRACT(MONTH FROM o.OrderDate) AS OrderMonth,
+    EXTRACT(YEAR FROM o.OrderDate) AS OrderYear,
+    o.Amount,
+    c.JoinDate
+FROM Orders o
+JOIN Sellers s ON o.SellerID = s.SellerID
+JOIN Products p ON o.ProductID = p.ProductID
+JOIN Customers c ON o.CustomerID = c.CustomerID
+WHERE o.OrderDate >= '2023-01-01';
