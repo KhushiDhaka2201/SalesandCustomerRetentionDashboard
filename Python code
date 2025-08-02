@@ -1,0 +1,27 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Data
+df = pd.read_csv('sales_data.csv')
+df['OrderDate'] = pd.to_datetime(df['OrderDate'])
+df['JoinDate'] = pd.to_datetime(df['JoinDate'])
+
+# Create OrderMonth and CohortMonth
+df['OrderMonth'] = df['OrderDate'].dt.to_period('M')
+df['CohortMonth'] = df['JoinDate'].dt.to_period('M')
+
+# Calculate Cohort Index
+df['CohortIndex'] = (df['OrderMonth'] - df['CohortMonth']).apply(attrgetter('n'))
+
+# Retention Pivot Table
+cohort_data = df.groupby(['CohortMonth', 'CohortIndex'])['CustomerID'].nunique().reset_index()
+cohort_pivot = cohort_data.pivot(index='CohortMonth', columns='CohortIndex', values='CustomerID')
+
+# Plot Retention Heatmap
+plt.figure(figsize=(12, 6))
+sns.heatmap(cohort_pivot, annot=True, fmt='.0f', cmap='Blues')
+plt.title('Customer Retention by Cohort')
+plt.xlabel('Months Since First Purchase')
+plt.ylabel('Cohort Month')
+plt.show()
